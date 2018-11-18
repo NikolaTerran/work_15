@@ -2,8 +2,8 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <sys/wait.h>
-#include <time.h>
 #include <fcntl.h>
+#include <time.h>
 
 int main(){
 	printf("parent pid is: %d\n",getpid());
@@ -11,19 +11,20 @@ int main(){
 	if(f){
 		f = fork();
 	}
-	if(!f){
-		int random = open("dev/random",O_RDONLY);
-		int i;
-		read(random,&i,4);
-		i = (i%25)+5;
+	if(!f){	//address of a pointer is random enough for me
+		srand(time(NULL) + getpid());
+		int i = rand();
+		i = abs(i)%25+5;
 		printf("child pid is: %d\n",getpid());
-		printf("i=%d\n",i);
-		printf("gonna sleep for %d seconds\n",sleep(i));
+		printf("Gonna sleep for %d seconds\n",i);
+		sleep(i);
 		printf("child#%d is terminated\n",getpid());
 		exit(i);
 	}
-	int p, status;
+	int p,status;
 	p = wait(&status);
+	printf("child slept for %d seconds\n",WEXITSTATUS(status));
+	printf("parent is terminated\n");
 	//MACRO();
 	return 0;
 }
